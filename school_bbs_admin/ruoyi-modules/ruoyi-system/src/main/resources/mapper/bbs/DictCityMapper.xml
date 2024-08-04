@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bbs.mapper.DictCityMapper">
+
+    <resultMap type="com.ruoyi.bbs.domain.DictCity" id="DictCityResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="provinceId"    column="province_id"    />
+    </resultMap>
+
+    <sql id="selectDictCityVo">
+        select id, name, province_id from bbs_user.dict_city
+    </sql>
+
+    <select id="selectDictCityList" parameterType="com.ruoyi.bbs.domain.DictCity" resultMap="DictCityResult">
+        <include refid="selectDictCityVo"/>
+        <where>
+            <if test="id != null "> and id = #{id}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="provinceId != null "> and province_id = #{provinceId}</if>
+        </where>
+    </select>
+
+    <select id="selectDictCityById" parameterType="Long" resultMap="DictCityResult">
+        <include refid="selectDictCityVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertDictCity" parameterType="com.ruoyi.bbs.domain.DictCity" useGeneratedKeys="true" keyProperty="id">
+        insert into bbs_user.dict_city
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="provinceId != null">province_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="provinceId != null">#{provinceId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDictCity" parameterType="com.ruoyi.bbs.domain.DictCity">
+        update bbs_user.dict_city
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="provinceId != null">province_id = #{provinceId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDictCityById" parameterType="Long">
+        delete from bbs_user.dict_city where id = #{id}
+    </delete>
+
+    <delete id="deleteDictCityByIds" parameterType="String">
+        delete from bbs_user.dict_city where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

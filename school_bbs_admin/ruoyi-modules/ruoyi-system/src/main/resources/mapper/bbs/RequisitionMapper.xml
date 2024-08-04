@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bbs.mapper.RequisitionMapper">
+    
+    <resultMap type="com.ruoyi.bbs.domain.Requisition" id="RequisitionResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="description"    column="description"    />
+        <result property="auditor"    column="auditor"    />
+        <result property="status"    column="status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="auditorTime"    column="auditor_time"    />
+    </resultMap>
+
+    <sql id="selectRequisitionVo">
+        select id, user_id, description, auditor, status, create_time, auditor_time from bbs_user.requisition
+    </sql>
+
+    <select id="selectRequisitionList" parameterType="com.ruoyi.bbs.domain.Requisition" resultMap="RequisitionResult">
+        <include refid="selectRequisitionVo"/>
+        <where>  
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+            <if test="auditor != null  and auditor != ''"> and auditor = #{auditor}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="createTime != null "> and create_time = #{createTime}</if>
+            <if test="auditorTime != null "> and auditor_time = #{auditorTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectRequisitionById" parameterType="Long" resultMap="RequisitionResult">
+        <include refid="selectRequisitionVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertRequisition" parameterType="com.ruoyi.bbs.domain.Requisition">
+        insert into bbs_user.requisition
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="description != null">description,</if>
+            <if test="auditor != null">auditor,</if>
+            <if test="status != null">status,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="auditorTime != null">auditor_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="description != null">#{description},</if>
+            <if test="auditor != null">#{auditor},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="auditorTime != null">#{auditorTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateRequisition" parameterType="com.ruoyi.bbs.domain.Requisition">
+        update bbs_user.requisition
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="auditor != null">auditor = #{auditor},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="auditorTime != null">auditor_time = #{auditorTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteRequisitionById" parameterType="Long">
+        delete from bbs_user.requisition where id = #{id}
+    </delete>
+
+    <delete id="deleteRequisitionByIds" parameterType="String">
+        delete from bbs_user.requisition where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

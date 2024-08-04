@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bbs.mapper.DictSchoolMapper">
+    
+    <resultMap type="com.ruoyi.bbs.domain.DictSchool" id="DictSchoolResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="cityId"    column="city_id"    />
+    </resultMap>
+
+    <sql id="selectDictSchoolVo">
+        select id, name, city_id from bbs_user.dict_school
+    </sql>
+
+    <select id="selectDictSchoolList" parameterType="com.ruoyi.bbs.domain.DictSchool" resultMap="DictSchoolResult">
+        <include refid="selectDictSchoolVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="cityId != null "> and city_id = #{cityId}</if>
+        </where>
+    </select>
+    
+    <select id="selectDictSchoolById" parameterType="Long" resultMap="DictSchoolResult">
+        <include refid="selectDictSchoolVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertDictSchool" parameterType="com.ruoyi.bbs.domain.DictSchool" useGeneratedKeys="true" keyProperty="id">
+        insert into bbs_user.dict_school
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="cityId != null">city_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="cityId != null">#{cityId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDictSchool" parameterType="com.ruoyi.bbs.domain.DictSchool">
+        update bbs_user.dict_school
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="cityId != null">city_id = #{cityId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDictSchoolById" parameterType="Long">
+        delete from bbs_user.dict_school where id = #{id}
+    </delete>
+
+    <delete id="deleteDictSchoolByIds" parameterType="String">
+        delete from bbs_user.dict_school where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

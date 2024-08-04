@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.bbs</groupId>
+        <artifactId>bbs-common</artifactId>
+        <version>1.0</version>
+    </parent>
+    <groupId>com.bbs.common</groupId>
+    <artifactId>bbs-common-mybatis</artifactId>
+    <version>1.0</version>
+    <name>bbs-common-mybatis</name>
+    <description>
+        bbs-common-mybatis
+    </description>
+
+    <dependencies>
+        <!--mybatis-plus-->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.5.3.1</version>
+        </dependency>
+
+        <!-- Mysql Connector -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- Mybatis分页器 -->
+        <!-- <dependency> -->
+        <!--     <groupId>com.github.pagehelper</groupId> -->
+        <!--     <artifactId>pagehelper</artifactId> -->
+        <!--     <version>6.1.0</version> -->
+        <!--     <exclusions> -->
+        <!--         <exclusion> -->
+        <!--             <groupId>com.github.jsqlparser</groupId> -->
+        <!--             <artifactId>jsqlparser</artifactId> -->
+        <!--         </exclusion> -->
+        <!--     </exclusions> -->
+        <!-- </dependency> -->
+        <!-- <dependency> -->
+        <!--     <groupId>com.github.pagehelper</groupId> -->
+        <!--     <artifactId>sqlparser4.5</artifactId> -->
+        <!--     <version>6.1.0</version> -->
+        <!-- </dependency> -->
+
+        <dependency>
+            <groupId>com.bbs.common</groupId>
+            <artifactId>bbs-common-core</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
+
+</project>

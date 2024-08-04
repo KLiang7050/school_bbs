@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bbs.post.mapper.DetectionLogMapper">
+    <resultMap id="detectionLogResultMap" type="com.bbs.common.core.domain.post.entity.DetectionLog">
+        <id property="id" column="id"/>
+        <result property="contentId" column="content_id"/>
+        <result property="words" column="words"/>
+        <result property="isHandle" column="is_handle"/>
+        <result property="msg" column="msg"/>
+        <result property="replyFlag" column="reply_flag"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="detectionLogColumns">id,content_id,words,is_handle,msg,reply_flag,create_time</sql>
+
+    <update id="handle">
+            update bbs_post.detection_log
+            set is_handle           = #{isHandle},
+                words               = #{words},
+                msg                 = #{msg}
+            where id = #{id}
+    </update>
+
+    <update id="pass">
+        update bbs_post.detection_log
+        set is_handle = '1'
+        where id = #{id}
+    </update>
+
+    <update id="ban">
+        update bbs_post.detection_log
+        set is_handle = '5',msg = '已审核不合规'
+        where id = #{id}
+    </update>
+
+    <select id="unHandle" resultMap="detectionLogResultMap">
+        select
+            <include refid="detectionLogColumns"/>
+        from bbs_post.detection_log
+        where is_handle = '0'
+    </select>
+
+    <select id="getOutList" resultType="com.bbs.common.core.domain.post.dto.DetectionLogDTO">
+        select
+            dl.id,
+            dl.content_id as contentId,
+            dl.words,
+            dl.is_handle as isHandle,
+            dl.msg,
+            dl.reply_flag as replyFlag,
+            dl.create_time as createTime,
+            pc.content
+        from bbs_post.detection_log dl
+                 left join bbs_post.post_content pc on dl.content_id = pc.id
+        where is_handle != '1' and is_handle != '5'
+        order by create_time desc
+        limit #{startNum},#{pageSize}
+    </select>
+
+
+</mapper>

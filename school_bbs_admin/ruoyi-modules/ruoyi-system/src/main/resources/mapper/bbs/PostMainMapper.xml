@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bbs.mapper.PostMainMapper">
+    
+    <resultMap type="com.ruoyi.bbs.domain.PostMain" id="PostMainResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="type"    column="type"    />
+        <result property="typeId"    column="type_id"    />
+        <result property="title"    column="title"    />
+        <result property="contentId"    column="content_id"    />
+        <result property="replyCount"    column="reply_count"    />
+        <result property="likes"    column="likes"    />
+        <result property="favorites"    column="favorites"    />
+        <result property="isEnable"    column="is_enable"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectPostMainVo">
+        select id, user_id, type, type_id, title, content_id, reply_count, likes, favorites, is_enable, del_flag, create_time, update_time from bbs_post.post_main
+    </sql>
+
+    <sql id="selectPostMainJoinPostContent">
+        SELECT
+            m.id,
+            m.user_id,
+            m.reply_count,
+            m.likes,
+            m.favorites,
+            m.content_id,
+            m.title,
+            m.type_id,
+            m.type,
+            m.is_enable,
+            m.del_flag,
+            m.create_time,
+            m.update_time,
+            c.content,
+            c.media_url
+        FROM bbs_post.post_main m
+        left join bbs_post.post_content c on m.content_id = c.id
+    </sql>
+
+    <select id="selectPostMainList" parameterType="com.ruoyi.bbs.domain.PostMain" resultMap="PostMainResult">
+        <include refid="selectPostMainVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="typeId != null "> and type_id = #{typeId}</if>
+            <if test="title != null  and title != ''"> and title like concat('%', #{title}, '%')</if>
+            <if test="contentId != null "> and content_id = #{contentId}</if>
+            <if test="replyCount != null "> and reply_count > #{replyCount}</if>
+            <if test="likes != null "> and likes > #{likes}</if>
+            <if test="favorites != null "> and favorites > #{favorites}</if>
+            <if test="isEnable != null  and isEnable != ''"> and is_enable = #{isEnable}</if>
+        </where>
+    </select>
+    
+    <select id="selectPostMainById" parameterType="Long" resultMap="PostMainResult">
+        <include refid="selectPostMainVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectTodayNewPost" resultType="java.lang.Integer">
+        select count(*) from bbs_post.post_main where DATE_FORMAT(create_time, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
+    </select>
+
+    <select id="selectUnaudited" resultType="com.ruoyi.bbs.domain.dto.MainDTO">
+        <include refid="selectPostMainJoinPostContent"/>
+        where
+        m.is_enable = 0
+        order by
+        m.create_time asc
+        limit ${startNum},${pageSize}
+    </select>
+
+    <insert id="insertPostMain" parameterType="com.ruoyi.bbs.domain.PostMain" useGeneratedKeys="true" keyProperty="id">
+        insert into bbs_post.post_main
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="type != null">type,</if>
+            <if test="typeId != null">type_id,</if>
+            <if test="title != null and title != ''">title,</if>
+            <if test="contentId != null">content_id,</if>
+            <if test="replyCount != null">reply_count,</if>
+            <if test="likes != null">likes,</if>
+            <if test="favorites != null">favorites,</if>
+            <if test="isEnable != null and isEnable != ''">is_enable,</if>
+            <if test="delFlag != null and delFlag != ''">del_flag,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="type != null">#{type},</if>
+            <if test="typeId != null">#{typeId},</if>
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="contentId != null">#{contentId},</if>
+            <if test="replyCount != null">#{replyCount},</if>
+            <if test="likes != null">#{likes},</if>
+            <if test="favorites != null">#{favorites},</if>
+            <if test="isEnable != null and isEnable != ''">#{isEnable},</if>
+            <if test="delFlag != null and delFlag != ''">#{delFlag},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePostMain" parameterType="com.ruoyi.bbs.domain.PostMain">
+        update bbs_post.post_main
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="typeId != null">type_id = #{typeId},</if>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="contentId != null">content_id = #{contentId},</if>
+            <if test="replyCount != null">reply_count = #{replyCount},</if>
+            <if test="likes != null">likes = #{likes},</if>
+            <if test="favorites != null">favorites = #{favorites},</if>
+            <if test="isEnable != null and isEnable != ''">is_enable = #{isEnable},</if>
+            <if test="delFlag != null and delFlag != ''">del_flag = #{delFlag},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="updatePostFlagByContentIdList">
+        update bbs_post.post_main
+        set is_enable = '1',update_time = now()
+        where content_id in
+        <foreach item="contentId" collection="list" open="(" separator="," close=")">
+            #{contentId}
+        </foreach>
+    </update>
+
+    <delete id="deletePostMainById" parameterType="Long">
+        delete from bbs_post.post_main where id = #{id}
+    </delete>
+
+    <delete id="deletePostMainByIds" parameterType="String">
+        delete from bbs_post.post_main where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

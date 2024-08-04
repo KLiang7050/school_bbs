@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bbs.mapper.PostReplyMapper">
+
+    <resultMap type="com.ruoyi.bbs.domain.PostReply" id="PostReplyResult">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="parentUserId" column="parent_user_id"/>
+        <result property="parentUserName" column="parent_user_name"/>
+        <result property="contentId" column="content_id"/>
+        <result property="rootId" column="root_id"/>
+        <result property="mainId" column="main_id"/>
+        <result property="replyCount" column="reply_count"/>
+        <result property="floor" column="floor"/>
+        <result property="likes" column="likes"/>
+        <result property="isEnable" column="is_enable"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectPostReplyVo">
+        select id,
+               user_id,
+               parent_id,
+               parent_user_id,
+               parent_user_name,
+               content_id,
+               root_id,
+               main_id,
+               reply_count,
+               floor,
+               likes,
+               is_enable,
+               del_flag,
+               create_time,
+               update_time
+        from bbs_post.post_reply
+    </sql>
+
+    <sql id="selectPostReplyJoinPostContent">
+        SELECT r.id,
+               r.user_id,
+               r.parent_id,
+               r.parent_user_id,
+               r.parent_user_name,
+               r.root_id,
+               r.main_id,
+               r.reply_count,
+               r.likes,
+               r.floor,
+               r.content_id,
+               r.is_enable,
+               r.del_flag,
+               r.create_time,
+               r.update_time,
+               c.content,
+               c.media_url
+        FROM bbs_post.post_reply r
+                 left join post_content c on r.content_id = c.id
+    </sql>
+
+    <select id="selectPostReplyList" parameterType="com.ruoyi.bbs.domain.PostReply" resultMap="PostReplyResult">
+        <include refid="selectPostReplyVo"/>
+        <where>
+            <if test="id != null ">and id = #{id}</if>
+            <if test="userId != null ">and user_id = #{userId}</if>
+            <if test="parentId != null ">and parent_id = #{parentId}</if>
+            <if test="parentUserId != null ">and parent_user_id = #{parentUserId}</if>
+            <if test="parentUserName != null  and parentUserName != ''">and parent_user_name like concat('%',
+                #{parentUserName}, '%')
+            </if>
+            <if test="contentId != null ">and content_id = #{contentId}</if>
+            <if test="rootId != null ">and root_id = #{rootId}</if>
+            <if test="mainId != null ">and main_id = #{mainId}</if>
+            <if test="replyCount != null ">and reply_count > #{replyCount}</if>
+            <if test="floor != null ">and floor = #{floor}</if>
+            <if test="likes != null ">and likes > #{likes}</if>
+            <if test="isEnable != null  and isEnable != ''">and is_enable = #{isEnable}</if>
+            <if test="delFlag != null  and delFlag != ''">and del_flag = #{delFlag}</if>
+            <if test="createTime != null ">and create_time = #{createTime}</if>
+            <if test="updateTime != null ">and update_time = #{updateTime}</if>
+        </where>
+    </select>
+
+    <select id="selectPostReplyById" parameterType="Long" resultMap="PostReplyResult">
+        <include refid="selectPostReplyVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertPostReply" parameterType="com.ruoyi.bbs.domain.PostReply" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into bbs_post.post_reply
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="parentUserId != null">parent_user_id,</if>
+            <if test="parentUserName != null and parentUserName != ''">parent_user_name,</if>
+            <if test="contentId != null">content_id,</if>
+            <if test="rootId != null">root_id,</if>
+            <if test="mainId != null">main_id,</if>
+            <if test="replyCount != null">reply_count,</if>
+            <if test="floor != null">floor,</if>
+            <if test="likes != null">likes,</if>
+            <if test="isEnable != null and isEnable != ''">is_enable,</if>
+            <if test="delFlag != null and delFlag != ''">del_flag,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="parentId != null">#{parentId},</if>
+            <if test="parentUserId != null">#{parentUserId},</if>
+            <if test="parentUserName != null and parentUserName != ''">#{parentUserName},</if>
+            <if test="contentId != null">#{contentId},</if>
+            <if test="rootId != null">#{rootId},</if>
+            <if test="mainId != null">#{mainId},</if>
+            <if test="replyCount != null">#{replyCount},</if>
+            <if test="floor != null">#{floor},</if>
+            <if test="likes != null">#{likes},</if>
+            <if test="isEnable != null and isEnable != ''">#{isEnable},</if>
+            <if test="delFlag != null and delFlag != ''">#{delFlag},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updatePostReply" parameterType="com.ruoyi.bbs.domain.PostReply">
+        update bbs_post.post_reply
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="parentUserId != null">parent_user_id = #{parentUserId},</if>
+            <if test="parentUserName != null and parentUserName != ''">parent_user_name = #{parentUserName},</if>
+            <if test="contentId != null">content_id = #{contentId},</if>
+            <if test="rootId != null">root_id = #{rootId},</if>
+            <if test="mainId != null">main_id = #{mainId},</if>
+            <if test="replyCount != null">reply_count = #{replyCount},</if>
+            <if test="floor != null">floor = #{floor},</if>
+            <if test="likes != null">likes = #{likes},</if>
+            <if test="isEnable != null and isEnable != ''">is_enable = #{isEnable},</if>
+            <if test="delFlag != null and delFlag != ''">del_flag = #{delFlag},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deletePostReplyById" parameterType="Long">
+        delete
+        from bbs_post.post_reply
+        where id = #{id}
+    </delete>
+
+    <delete id="deletePostReplyByIds" parameterType="String">
+        delete from bbs_post.post_reply where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

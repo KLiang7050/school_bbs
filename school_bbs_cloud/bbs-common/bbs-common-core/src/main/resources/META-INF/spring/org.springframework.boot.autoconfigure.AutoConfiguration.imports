@@ -1,0 +1,2 @@
+com.bbs.common.core.exception.GlobalExceptionHandler
+com.bbs.common.core.feign.config.FeignMultipartSupportConfig

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bbs.mapper.LikeUserMapper">
+    
+    <resultMap type="com.ruoyi.bbs.domain.LikeUser" id="LikeUserResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="postId"    column="post_id"    />
+        <result property="mainId"    column="main_id"    />
+        <result property="type"    column="type"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectLikeUserVo">
+        select id, user_id, post_id, main_id, type, create_time from bbs_like.like_user
+    </sql>
+
+    <select id="selectLikeUserList" parameterType="com.ruoyi.bbs.domain.LikeUser" resultMap="LikeUserResult">
+        <include refid="selectLikeUserVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="postId != null "> and post_id = #{postId}</if>
+            <if test="mainId != null "> and main_id = #{mainId}</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="createTime != null "> and create_time = #{createTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectLikeUserById" parameterType="Long" resultMap="LikeUserResult">
+        <include refid="selectLikeUserVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectTodayCount" resultType="java.lang.Integer">
+        select count(*) from bbs_like.like_user where DATE_FORMAT(create_time, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
+    </select>
+
+    <insert id="insertLikeUser" parameterType="com.ruoyi.bbs.domain.LikeUser" useGeneratedKeys="true" keyProperty="id">
+        insert into bbs_like.like_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="postId != null">post_id,</if>
+            <if test="mainId != null">main_id,</if>
+            <if test="type != null">type,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="postId != null">#{postId},</if>
+            <if test="mainId != null">#{mainId},</if>
+            <if test="type != null">#{type},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateLikeUser" parameterType="com.ruoyi.bbs.domain.LikeUser">
+        update bbs_like.like_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="postId != null">post_id = #{postId},</if>
+            <if test="mainId != null">main_id = #{mainId},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteLikeUserById" parameterType="Long">
+        delete from bbs_like.like_user where id = #{id}
+    </delete>
+
+    <delete id="deleteLikeUserByIds" parameterType="String">
+        delete from bbs_like.like_user where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

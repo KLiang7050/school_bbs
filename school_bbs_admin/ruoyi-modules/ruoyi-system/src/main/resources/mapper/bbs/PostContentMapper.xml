@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bbs.mapper.PostContentMapper">
+    
+    <resultMap type="com.ruoyi.bbs.domain.PostContent" id="PostContentResult">
+        <result property="id"    column="id"    />
+        <result property="content"    column="content"    />
+        <result property="mediaUrl"    column="media_url"    />
+    </resultMap>
+
+    <sql id="selectPostContent">
+        select id, content, media_url from bbs_post.post_content
+    </sql>
+
+    <select id="selectPostContentList" parameterType="com.ruoyi.bbs.domain.PostContent" resultMap="PostContentResult">
+        <include refid="selectPostContent"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+        </where>
+    </select>
+    
+    <select id="selectPostContentById" parameterType="Long" resultMap="PostContentResult">
+        <include refid="selectPostContent"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectByIdList" resultType="com.ruoyi.bbs.domain.dto.DetectionLogDTO">
+        <foreach item="item" collection="list" separator=";">
+            select
+            #{item.id} as id,
+            #{item.contentId} as contentId,
+            #{item.words} as words,
+            #{item.isHandle} as isHandle,
+            #{item.msg} as msg,
+            #{item.createTime} as createTime,
+            content
+            from bbs_post.post_content
+            where id = #{item.contentId}
+        </foreach>
+    </select>
+
+    <insert id="insertPostContent" parameterType="com.ruoyi.bbs.domain.PostContent" useGeneratedKeys="true" keyProperty="id">
+        insert into bbs_post.post_content
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="content != null and content != ''">content,</if>
+            <if test="mediaUrl != null">media_url,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="mediaUrl != null">#{mediaUrl},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePostContent" parameterType="com.ruoyi.bbs.domain.PostContent">
+        update bbs_post.post_content
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="content != null and content != ''">content = #{content},</if>
+            <if test="mediaUrl != null">media_url = #{mediaUrl},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deletePostContentById" parameterType="Long">
+        delete from bbs_post.post_content where id = #{id}
+    </delete>
+
+    <delete id="deletePostContentByIds" parameterType="String">
+        delete from bbs_post.post_content where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

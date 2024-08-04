@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bbs.post.mapper.PostReplyMapper">
+
+    <resultMap id="postReplyResultMap" type="com.bbs.common.core.domain.post.entity.PostReply">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="parentUserId" column="parent_user_id"/>
+        <result property="parentUserName" column="parent_user_name"/>
+        <result property="rootId" column="root_id"/>
+        <result property="mainId" column="main_id"/>
+        <result property="replyCount" column="reply_count"/>
+        <result property="likes" column="likes"/>
+        <result property="floor" column="floor"/>
+        <result property="contentId" column="content_id"/>
+        <result property="isEnable" column="is_enable"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="createTime" column="create_time" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="selectPostReply">
+        SELECT
+            r.id,
+            r.user_id,
+            r.parent_id,
+            r.parent_user_id,
+            r.parent_user_name,
+            r.root_id,
+            r.main_id,
+            r.reply_count,
+            r.likes,
+            r.floor,
+            r.content_id,
+            r.is_enable,
+            r.del_flag,
+            r.create_time,
+            r.update_time
+        FROM post_reply r
+    </sql>
+
+    <sql id="selectPostReplyJoinPostContent">
+        SELECT
+            r.id,
+            r.user_id,
+            r.parent_id,
+            r.parent_user_id,
+            r.parent_user_name,
+            r.root_id,
+            r.main_id,
+            r.reply_count,
+            r.likes,
+            r.floor,
+            r.content_id,
+            r.is_enable,
+            r.del_flag,
+            r.create_time,
+            r.update_time,
+            c.content,
+            c.media_url
+        FROM post_reply r
+        left join post_content c on r.content_id = c.id
+    </sql>
+
+    <insert id="addLikeById">
+        update post_reply set likes=likes+1 where id=#{id}
+    </insert>
+
+    <update id="updateReplyCount">
+        update post_reply set reply_count=reply_count+1 where id=#{id}
+    </update>
+
+    <select id="selectByMainId_COUNT" resultType="Long">
+        select count(*) from post_reply where main_id=#{mainId} and root_id=0 and del_flag=0 and is_enable=1
+    </select>
+    <select id="selectRootByMainId" resultType="com.bbs.common.core.domain.post.dto.ReplyDTO">
+        <include refid="selectPostReplyJoinPostContent"/>
+        where
+        r.main_id=#{mainId}
+        and
+        r.root_id=0
+        and
+        r.del_flag=0
+        and
+        r.is_enable=1
+        order by r.root_id ASC
+        <if test="orderByColumn != null and orderByColumn != ''">,${orderByColumn} desc</if>
+    </select>
+
+    <select id="selectByRootIdList" resultType="com.bbs.common.core.domain.post.dto.ReplyDTO">
+        WITH RankedData AS (
+            SELECT
+                r.id,
+                r.user_id,
+                r.parent_id,
+                r.parent_user_id,
+                r.parent_user_name,
+                r.root_id,
+                r.main_id,
+                r.reply_count,
+                r.likes,
+                r.floor,
+                r.content_id,
+                r.is_enable,
+                r.del_flag,
+                r.create_time,
+                r.update_time,
+                c.content,
+                c.media_url,
+                ROW_NUMBER() OVER (PARTITION BY root_id ORDER BY create_time) AS row_num
+            FROM post_reply r
+            left join post_content c on r.content_id = c.id
+            WHERE
+                r.root_id IN
+                <foreach collection="rootIdList" item="rootId" open="(" close=")" separator=",">
+                    #{rootId}
+                </foreach>
+            and
+                r.del_flag=0
+            and
+                r.is_enable=1
+        )
+
+        SELECT
+            *
+        FROM
+            RankedData a
+        WHERE
+            a.row_num &lt; 4
+    </select>
+
+    <select id="selectByRootId" resultType="com.bbs.common.core.domain.post.dto.ReplyDTO">
+        <include refid="selectPostReplyJoinPostContent"/>
+        where
+        r.root_id = #{rootId}
+        and
+        r.del_flag=0
+        and
+        r.is_enable=1
+        order by id asc,${orderByColumn} desc
+    </select>
+    <select id="selectReply2ByUserId" resultType="com.bbs.common.core.domain.post.dto.ReplyDTO">
+        <include refid="selectPostReplyJoinPostContent"/>
+        where
+        r.parent_user_id = #{userId}
+        and
+        r.root_id != 0
+        and
+        r.del_flag=0
+        and
+        r.is_enable=1
+        order by id asc,create_time desc
+    </select>
+
+    <select id="selectReply2ByUserId_COUNT" resultType="Long">
+        select count(*) from post_reply r
+        where
+        r.user_id = #{userId}
+        and
+        r.root_id != 0
+        and
+        r.del_flag=0
+        and
+        r.is_enable=1
+    </select>
+    <select id="selectByIds" resultType="com.bbs.common.core.domain.post.dto.ReplyDTO">
+        <include refid="selectPostReplyJoinPostContent"/>
+        where
+        r.id in
+        <foreach collection="postIdList" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        and
+        r.del_flag=0
+        and
+        r.is_enable=1
+        order by id asc
+    </select>
+
+    <update id="addLikeBatchById">
+        <foreach collection="list" item="post" separator=";">
+            update post_reply
+            <set>
+                likes=likes+#{post.likes},
+                update_time=now()
+            </set>
+            where
+            id=#{post.id}
+        </foreach>
+    </update>
+    <update id="minusLikeBatchById">
+        update post_reply
+        <set>
+            likes=likes-1,
+            update_time=now()
+        </set>
+        where
+        id=#{postId}
+    </update>
+
+    <update id="updatePostFlagByContentIdList">
+        update bbs_post.post_reply
+        set is_enable = '1',update_time = now()
+        where content_id in
+        <foreach item="contentId" collection="list" open="(" separator="," close=")">
+            #{contentId}
+        </foreach>
+    </update>
+</mapper>

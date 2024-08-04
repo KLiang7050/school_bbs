@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bbs.post.mapper.PostContentMapper">
+    
+    <resultMap type="com.bbs.common.core.domain.post.entity.PostContent" id="PostContentResult">
+        <result property="id"    column="id"    />
+        <result property="content"    column="content"    />
+        <result property="mediaUrl"    column="media_url"    />
+    </resultMap>
+
+    <sql id="selectPostContent">
+        select id, content, media_url from post_content
+    </sql>
+
+    <insert id="insertPostContent" parameterType="com.bbs.common.core.domain.post.entity.PostContent" useGeneratedKeys="true" keyProperty="id">
+        insert into post_content
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="content != null">content,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="content != null">#{content},</if>
+         </trim>
+    </insert>
+    <select id="selectByIdList" resultType="com.bbs.common.core.domain.post.entity.PostContent">
+        <include refid="selectPostContent"/>
+        where id in
+        <foreach collection="idList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        order by id
+    </select>
+
+    <select id="selectDetectionLogDTOByIdList" resultType="com.bbs.common.core.domain.post.dto.DetectionLogDTO">
+            select
+            #{id} as id,
+            #{contentId} as contentId,
+            #{words} as words,
+            #{isHandle} as isHandle,
+            #{msg} as msg,
+            #{createTime} as createTime,
+            #{replyFlag} as replyFlag,
+            content
+            from bbs_post.post_content
+            where id = #{contentId}
+    </select>
+</mapper>

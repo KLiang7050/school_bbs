@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bbs.mapper.UserMapper">
+    
+    <resultMap type="com.ruoyi.bbs.domain.User" id="UserResult">
+        <result property="id"    column="id"    />
+        <result property="realName"    column="real_name"    />
+        <result property="nickName"    column="nick_name"    />
+        <result property="username"    column="username"    />
+        <result property="password"    column="password"    />
+        <result property="tel"    column="tel"    />
+        <result property="sex"    column="sex"    />
+        <result property="avatar"    column="avatar"    />
+        <result property="introduce"    column="introduce"    />
+        <result property="birthday"    column="birthday"    />
+        <result property="studentId"    column="student_id"    />
+        <result property="school"    column="school"    />
+        <result property="college"    column="college"    />
+        <result property="major"    column="major"    />
+        <result property="postCount"    column="post_count"    />
+        <result property="favoritesCount"    column="favorites_count"    />
+        <result property="likeCount"    column="like_count"    />
+        <result property="isEnable"    column="is_enable"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="enrollmentTime"    column="enrollment_time"    />
+    </resultMap>
+
+    <sql id="selectUserVo">
+        select id, real_name, nick_name, username, password, tel, sex, avatar, introduce, birthday, student_id, school, college, major, post_count, favorites_count, like_count, is_enable, del_flag, create_time, update_time, enrollment_time from bbs_user.user
+    </sql>
+
+    <select id="selectUserList" parameterType="com.ruoyi.bbs.domain.User" resultMap="UserResult">
+        <include refid="selectUserVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+            <if test="realName != null  and realName != ''"> and real_name like concat('%', #{realName}, '%')</if>
+            <if test="nickName != null  and nickName != ''"> and nick_name like concat('%', #{nickName}, '%')</if>
+            <if test="username != null  and username != ''"> and username like concat('%', #{username}, '%')</if>
+            <if test="password != null  and password != ''"> and password = #{password}</if>
+            <if test="tel != null  and tel != ''"> and tel = #{tel}</if>
+            <if test="sex != null  and sex != ''"> and sex = #{sex}</if>
+            <if test="avatar != null  and avatar != ''"> and avatar = #{avatar}</if>
+            <if test="introduce != null  and introduce != ''"> and introduce = #{introduce}</if>
+            <if test="birthday != null "> and birthday = #{birthday}</if>
+            <if test="studentId != null "> and student_id = #{studentId}</if>
+            <if test="school != null  and school != ''"> and school = #{school}</if>
+            <if test="college != null  and college != ''"> and college = #{college}</if>
+            <if test="major != null  and major != ''"> and major = #{major}</if>
+            <if test="postCount != null "> and post_count > #{postCount}</if>
+            <if test="favoritesCount != null "> and favorites_count > #{favoritesCount}</if>
+            <if test="likeCount != null "> and like_count > #{likeCount}</if>
+            <if test="isEnable != null  and isEnable != ''"> and is_enable = #{isEnable}</if>
+            <if test="delFlag != null  and delFlag != ''"> and del_flag = #{delFlag}</if>
+            <if test="createTime != null "> and create_time = #{createTime}</if>
+            <if test="updateTime != null "> and update_time = #{updateTime}</if>
+            <if test="enrollmentTime != null "> and enrollment_time = #{enrollmentTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectUserById" parameterType="Long" resultMap="UserResult">
+        <include refid="selectUserVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectCount" resultType="java.lang.Integer">
+        select count(*)
+        from bbs_user.user
+        where del_flag = '0'
+          and is_enable = '0'
+    </select>
+
+    <insert id="insertUser" parameterType="com.ruoyi.bbs.domain.User" useGeneratedKeys="true" keyProperty="id">
+        insert into bbs_user.user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="realName != null">real_name,</if>
+            <if test="nickName != null">nick_name,</if>
+            <if test="username != null and username != ''">username,</if>
+            <if test="password != null and password != ''">password,</if>
+            <if test="tel != null and tel != ''">tel,</if>
+            <if test="sex != null and sex != ''">sex,</if>
+            <if test="avatar != null">avatar,</if>
+            <if test="introduce != null">introduce,</if>
+            <if test="birthday != null">birthday,</if>
+            <if test="studentId != null">student_id,</if>
+            <if test="school != null">school,</if>
+            <if test="college != null">college,</if>
+            <if test="major != null">major,</if>
+            <if test="postCount != null">post_count,</if>
+            <if test="favoritesCount != null">favorites_count,</if>
+            <if test="likeCount != null">like_count,</if>
+            <if test="isEnable != null and isEnable != ''">is_enable,</if>
+            <if test="delFlag != null and delFlag != ''">del_flag,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="enrollmentTime != null">enrollment_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="realName != null">#{realName},</if>
+            <if test="nickName != null">#{nickName},</if>
+            <if test="username != null and username != ''">#{username},</if>
+            <if test="password != null and password != ''">#{password},</if>
+            <if test="tel != null and tel != ''">#{tel},</if>
+            <if test="sex != null and sex != ''">#{sex},</if>
+            <if test="avatar != null">#{avatar},</if>
+            <if test="introduce != null">#{introduce},</if>
+            <if test="birthday != null">#{birthday},</if>
+            <if test="studentId != null">#{studentId},</if>
+            <if test="school != null">#{school},</if>
+            <if test="college != null">#{college},</if>
+            <if test="major != null">#{major},</if>
+            <if test="postCount != null">#{postCount},</if>
+            <if test="favoritesCount != null">#{favoritesCount},</if>
+            <if test="likeCount != null">#{likeCount},</if>
+            <if test="isEnable != null and isEnable != ''">#{isEnable},</if>
+            <if test="delFlag != null and delFlag != ''">#{delFlag},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="enrollmentTime != null">#{enrollmentTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateUser" parameterType="com.ruoyi.bbs.domain.User">
+        update bbs_user.user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="realName != null">real_name = #{realName},</if>
+            <if test="nickName != null">nick_name = #{nickName},</if>
+            <if test="username != null and username != ''">username = #{username},</if>
+            <if test="password != null and password != ''">password = #{password},</if>
+            <if test="tel != null and tel != ''">tel = #{tel},</if>
+            <if test="sex != null and sex != ''">sex = #{sex},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="introduce != null">introduce = #{introduce},</if>
+            <if test="birthday != null">birthday = #{birthday},</if>
+            <if test="studentId != null">student_id = #{studentId},</if>
+            <if test="school != null">school = #{school},</if>
+            <if test="college != null">college = #{college},</if>
+            <if test="major != null">major = #{major},</if>
+            <if test="postCount != null">post_count = #{postCount},</if>
+            <if test="favoritesCount != null">favorites_count = #{favoritesCount},</if>
+            <if test="likeCount != null">like_count = #{likeCount},</if>
+            <if test="isEnable != null and isEnable != ''">is_enable = #{isEnable},</if>
+            <if test="delFlag != null and delFlag != ''">del_flag = #{delFlag},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="enrollmentTime != null">enrollment_time = #{enrollmentTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteUserById" parameterType="Long">
+        delete from bbs_user.user where id = #{id}
+    </delete>
+
+    <delete id="deleteUserByIds" parameterType="String">
+        delete from bbs_user.user where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

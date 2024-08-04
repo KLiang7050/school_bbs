@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bbs.mapper.FavoritesUserMapper">
+    
+    <resultMap type="com.ruoyi.bbs.domain.FavoritesUser" id="FavoritesUserResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="postId"    column="post_id"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectFavoritesUserVo">
+        select id, user_id, post_id, create_time from bbs_like.favorites_user
+    </sql>
+
+    <select id="selectFavoritesUserList" parameterType="com.ruoyi.bbs.domain.FavoritesUser" resultMap="FavoritesUserResult">
+        <include refid="selectFavoritesUserVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="postId != null "> and post_id = #{postId}</if>
+            <if test="createTime != null "> and create_time = #{createTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectFavoritesUserById" parameterType="Long" resultMap="FavoritesUserResult">
+        <include refid="selectFavoritesUserVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectTodayCount" resultType="java.lang.Integer">
+        select count(*) from bbs_like.favorites_user where DATE_FORMAT(create_time, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
+    </select>
+
+    <insert id="insertFavoritesUser" parameterType="com.ruoyi.bbs.domain.FavoritesUser" useGeneratedKeys="true" keyProperty="id">
+        insert into bbs_like.favorites_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="postId != null">post_id,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="postId != null">#{postId},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFavoritesUser" parameterType="com.ruoyi.bbs.domain.FavoritesUser">
+        update bbs_like.favorites_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="postId != null">post_id = #{postId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteFavoritesUserById" parameterType="Long">
+        delete from bbs_like.favorites_user where id = #{id}
+    </delete>
+
+    <delete id="deleteFavoritesUserByIds" parameterType="String">
+        delete from bbs_like.favorites_user where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

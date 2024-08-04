@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bbs.user.mapper.UserMapper">
+
+    <resultMap type="com.bbs.common.core.domain.user.entity.User" id="UserResult">
+        <result property="id" column="id"/>
+        <result property="realName" column="real_name"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="tel" column="tel"/>
+        <result property="sex" column="sex"/>
+        <result property="avatar" column="avatar"/>
+        <result property="introduce" column="introduce"/>
+        <result property="birthday" column="birthday"/>
+        <result property="studentId" column="student_id"/>
+        <result property="school" column="school"/>
+        <result property="college" column="college"/>
+        <result property="major" column="major"/>
+        <result property="postCount" column="post_count"/>
+        <result property="favoritesCount" column="favorites_count"/>
+        <result property="likeCount" column="like_count"/>
+        <result property="isEnable" column="is_enable"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="enrollmentTime" column="enrollment_time"/>
+    </resultMap>
+
+    <sql id="selectUserVo">
+        select id,
+               real_name,
+               nick_name,
+               username,
+               password,
+               tel,
+               sex,
+               avatar,
+               introduce,
+               birthday,
+               student_id,
+               school,
+               college,
+               major,
+               post_count,
+               favorites_count,
+               like_count,
+               is_enable,
+               del_flag,
+               create_time,
+               update_time,
+               enrollment_time
+        from user
+    </sql>
+
+    <update id="addLikeCount">
+        update user set like_count = like_count + 1 where id = #{id}
+    </update>
+
+    <update id="addPostCountById">
+        update user set post_count = post_count + 1 where id = #{id}
+    </update>
+
+    <select id="selectUserList" parameterType="com.bbs.common.core.domain.user.entity.User" resultMap="UserResult">
+        <include refid="selectUserVo"/>
+        <where>
+            <if test="id != null ">and id like concat('%', #{id}, '%')</if>
+            <if test="realName != null  and realName != ''">and real_name like concat('%', #{realName}, '%')</if>
+            <if test="nickName != null  and nickName != ''">and nick_name like concat('%', #{nickName}, '%')</if>
+            <if test="username != null  and username != ''">and username like concat('%', #{username}, '%')</if>
+            <if test="password != null  and password != ''">and password like concat('%', #{password}, '%')</if>
+            <if test="tel != null  and tel != ''">and tel like concat('%', #{tel}, '%')</if>
+            <if test="sex != null  and sex != ''">and sex like concat('%', #{sex}, '%')</if>
+            <if test="avatar != null  and avatar != ''">and avatar like concat('%', #{avatar}, '%')</if>
+            <if test="introduce != null  and introduce != ''">and introduce like concat('%', #{introduce}, '%')</if>
+            <if test="birthday != null  and birthday != ''">and birthday like concat('%', #{birthday}, '%')</if>
+            <if test="school != null  and school != ''">and school like concat('%', #{school}, '%')</if>
+            <if test="college != null  and college != ''">and college like concat('%', #{college}, '%')</if>
+            <if test="major != null  and major != ''">and major like concat('%', #{major}, '%')</if>
+            <if test="postCount != null ">and post_count = #{postCount}</if>
+            <if test="favoritesCount != null ">and favorites_count = #{favoritesCount}</if>
+            <if test="likeCount != null ">and like_count = #{likeCount}</if>
+            <if test="status != null  and status != ''">and status = #{status}</if>
+            <if test="delFlag != null  and delFlag != ''">and del_flag = #{delFlag}</if>
+            <if test="createTime != null ">and create_time = #{createTime}</if>
+            <if test="updateTime != null ">and update_time = #{updateTime}</if>
+        </where>
+    </select>
+
+    <select id="selectUserListByIds" resultType="com.bbs.common.core.domain.user.entity.User">
+        <include refid="selectUserVo"/>
+        where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and del_flag = 0
+        order by id
+    </select>
+    <select id="selectUserById" resultType="com.bbs.common.core.domain.user.entity.User">
+        <include refid="selectUserVo"/>
+        where id = #{id} and del_flag = 0 and is_enable = 0
+    </select>
+
+    <update id="updatePWD" parameterType="com.bbs.common.core.domain.user.entity.User">
+        update user set password=#{password},update_time=#{updateTime} where id=#{id}
+    </update>
+    <update id="updateAvatar">
+        update user set avatar=#{avatar} where id=#{id}
+    </update>
+    <update id="minusLikeCount">
+        update user set like_count = like_count - 1 where id = #{id}
+    </update>
+    <update id="minusFavoriteCount">
+        update user set favorites_count = favorites_count - 1 where id = #{id}
+    </update>
+    <update id="addFavoriteCount">
+        update user set favorites_count = favorites_count + 1 where id = #{id}
+    </update>
+    <update id="minusPostCount">
+        update user set post_count = post_count - 1 where id = #{id}
+    </update>
+</mapper>

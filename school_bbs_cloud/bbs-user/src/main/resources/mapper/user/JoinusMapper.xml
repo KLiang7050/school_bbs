@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bbs.user.mapper.JoinusMapper">
+
+    <resultMap id="joinUsResultMap" type="com.bbs.common.core.domain.user.entity.Joinus">
+        <id property="id" column="id" javaType="java.lang.Long"/>
+        <result property="userId" column="user_id" javaType="java.lang.Long"/>
+        <result property="fileUrl" column="file_url" javaType="java.lang.String"/>
+        <result property="description" column="description" javaType="java.lang.String"/>
+        <result property="createTime" column="create_time" javaType="java.util.Date"/>
+        <result property="auditor" column="auditor" javaType="java.lang.String"/>
+        <result property="descriptionRes" column="description_res" javaType="java.lang.String"/>
+        <result property="school" column="school" javaType="java.lang.String"/>
+        <result property="backFlag" column="back_flag" javaType="java.lang.String"/>
+        <result property="status" column="status" javaType="java.lang.String"/>
+    </resultMap>
+    <select id="listByUserId" resultType="com.bbs.common.core.domain.user.vo.JoinusVo">
+        select
+            j.id,
+            j.user_id,
+            j.file_url,
+            j.description,
+            j.create_time,
+            j.auditor,
+            j.school,
+            j.description_res,
+            j.status,
+            j.back_flag,
+            u.nick_name
+        from joinus j
+        left join bbs_user.user u on j.user_id = u.id
+        where user_id = #{userId}
+        order by create_time desc
+    </select>
+    <select id="selectOneById" resultType="com.bbs.common.core.domain.user.vo.JoinusVo">
+        select j.id,
+               j.user_id,
+               j.file_url,
+               j.description,
+               j.create_time,
+               j.auditor,
+               j.school,
+               j.description_res,
+               j.status,
+               j.back_flag,
+               u.nick_name
+        from joinus j
+        left join bbs_user.user u on j.user_id = u.id
+        where j.id = #{id}
+    </select>
+
+</mapper>

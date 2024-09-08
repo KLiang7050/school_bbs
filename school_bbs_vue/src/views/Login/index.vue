@@ -9,10 +9,12 @@
       </div>
       <el-form label-position="top" :rules="rules" :model="loginForm" class="login-form" ref="loginFormRef">
         <el-form-item label="账号" prop="username">
-          <el-input type="text" v-model.trim="loginForm.username" autocomplete="off" @keyup.enter="handleLogin"></el-input>
+          <el-input type="text" v-model.trim="loginForm.username" autocomplete="off"
+            @keyup.enter="handleLogin"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input type="password" v-model.trim="loginForm.password" autocomplete="off" @keyup.enter="handleLogin"></el-input>
+          <el-input type="password" v-model.trim="loginForm.password" autocomplete="off"
+            @keyup.enter="handleLogin"></el-input>
         </el-form-item>
         <el-form-item label="验证码" prop="code">
           <el-input v-model.trim="loginForm.code" auto-complete="off" style="width: 63%" @keyup.enter="handleLogin">
@@ -28,6 +30,10 @@
         <el-form-item style="height: 18px">
           <el-text type="info" style="cursor: pointer;" @click="goLogin">游客身份进入...</el-text>
         </el-form-item>
+        <el-form-item style="height: 18px">
+          <el-text type="info" style="cursor: pointer;" @click="goLogin">第三方登录：</el-text>
+          <i class="el-icon-ali-Gitee" @click="gitLogin" style="color: brown;cursor: pointer;"></i>
+        </el-form-item>
         <el-form-item style="height: 30px">
           <el-button :loading="loading" style="width: 100%;height: 40px;" type="primary"
             @click="handleLogin">立即登录</el-button>
@@ -38,7 +44,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reqCodeImg } from '@/api/user'
+import { reqCodeImg, goGitee } from '@/api/user'
 import { reactive, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
@@ -112,6 +118,11 @@ const handleLogin = async () => {
     });
   }
   loading.value = false;
+}
+
+const gitLogin = async () => {
+  let res = await goGitee();
+  window.location.href = res;
 }
 
 // created执行

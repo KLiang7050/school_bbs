@@ -17,6 +17,7 @@ import com.bbs.user.service.IUserService;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
@@ -39,6 +40,7 @@ import static com.bbs.common.core.utils.web.AjaxResult.success;
 public class UserController {
 
     @Autowired
+    @Qualifier("userServiceImpl")
     IUserService userService;
     @Autowired
     StringRedisTemplate redisTemplate;
@@ -96,6 +98,10 @@ public class UserController {
 
     @PostMapping("login")
     public R login(@RequestBody @Validated LoginBody loginBody) throws BizException {
+        String code = redisTemplate.opsForValue().get(UserCacheKey.captchaCodeKey(loginBody.getUuid()));
+        if (code == null || !code.equals(loginBody.getCode())) {
+            throw new BizException("验证码错误");
+        }
         HashMap<String, Object> map = userService.login(loginBody);
         return R.ok(map);
     }
@@ -124,6 +130,10 @@ public class UserController {
 
     @PostMapping("register")
     public R register(@RequestBody @Validated RegisterBody registerBody) throws BizException {
+        String code = redisTemplate.opsForValue().get(UserCacheKey.captchaCodeKey(registerBody.getUuid()));
+        if (org.junit.platform.commons.util.StringUtils.isBlank(code) || !code.equals(registerBody.getCode())) {
+            throw new BizException("验证码错误");
+        }
         return userService.register(registerBody);
     }
 
@@ -145,7 +155,6 @@ public class UserController {
         int i = userService.studentVerification(code, Long.valueOf(id));
         return i > 0 ? AjaxResult.success("认证成功") : AjaxResult.error("认证失败");
     }
-
 
     @PostMapping("/addPostCount")
     R addPostCount(@RequestParam("id") Long userId) {

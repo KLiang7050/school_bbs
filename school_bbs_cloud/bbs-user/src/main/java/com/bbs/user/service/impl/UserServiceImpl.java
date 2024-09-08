@@ -20,6 +20,7 @@ import com.bbs.user.domain.LoginBody;
 import com.bbs.user.domain.RegisterBody;
 import com.bbs.user.mapper.UserMapper;
 import com.bbs.user.service.IUserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.platform.commons.util.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Autowired
     private StringRedisTemplate redisTemplate;
 
+    public boolean checkUserExists(String userName) {
+        return userMapper.selectOne(new QueryWrapper<User>().eq("username", userName)) == null;
+    }
+
     @Override
     public User selectUserByUserName(String username) {
         return baseMapper.selectOne(new QueryWrapper<User>().eq("username", username));
@@ -68,11 +73,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public HashMap<String, Object> login(LoginBody loginBody) throws BizException {
-        String code = redisTemplate.opsForValue().get(UserCacheKey.captchaCodeKey(loginBody.getUuid()));
-        if (code == null || !code.equals(loginBody.getCode())) {
-            throw new BizException("验证码错误");
-        }
-
         User user = userMapper.selectOne(new QueryWrapper<User>().eq("username", loginBody.getUsername()));
 
         if (user == null) {
@@ -112,10 +112,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public R register(RegisterBody registerBody) throws BizException {
-        String code = redisTemplate.opsForValue().get(UserCacheKey.captchaCodeKey(registerBody.getUuid()));
-        if (StringUtils.isBlank(code) || !code.equals(registerBody.getCode())) {
-            throw new BizException("验证码错误");
-        }
         User user = userMapper.selectOne(new QueryWrapper<User>().eq("username", registerBody.getUsername()));
         if (user != null) {
             throw new BizException("用户名已存在");
@@ -131,10 +127,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public R updatePWD(UpdateBody body) throws BizException {
-        String realCode = redisTemplate.opsForValue().get(UserCacheKey.captchaCodeKey(body.getUuid()));
-        if (!body.getCode().equals(realCode)) {
-            throw new BizException("验证码错误");
-        }
         String id = JwtUtils.getUserIdInHeader();
         User user = userMapper.selectUserById(Long.valueOf(id));
         String realPWD = user.getPassword();
@@ -189,7 +181,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public int studentVerification(String code, Long id) throws ParseException {
         Map<String, Object> map = remoteThirdPartyService.getInfo(code).getData();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy年MM月dd日");
-        Date birthdate = simpleDateFormat.parse((String)map.get(StudentInfoUtils.BIRTH_DATE));
+        Date birthdate = simpleDateFormat.parse((String) map.get(StudentInfoUtils.BIRTH_DATE));
         Date enrollmentTime = simpleDateFormat.parse((String) map.get(StudentInfoUtils.ENROLLMENT_DATE));
         String major = "" + map.get(StudentInfoUtils.MAJOR) + map.get(StudentInfoUtils.CLASS_NAME);
         String school = (String) map.get(StudentInfoUtils.SCHOOL);

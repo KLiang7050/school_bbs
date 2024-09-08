@@ -178,3 +178,10 @@ export function commitJoinus(datas) {
         data: datas
     })
 }
+
+export function goGitee() {
+    return request({
+        url: `/user/3rd/goGitee`,
+        method: 'get'
+    })
+}

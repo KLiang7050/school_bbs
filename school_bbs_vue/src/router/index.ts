@@ -2,6 +2,8 @@ import tokenUtils from '@/utils/tokenUtils'
 import $store from '@/store'; // 导入 store 实例
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import { inject } from "vue";
+
+
 const reload = inject("reload")
 
 
@@ -92,7 +94,6 @@ const blackList = ['/edit', '/joinus', '/joinusdetail', '/userinfo']
 router.beforeEach(async (to, from, next) => {
   window.document.title = '校园论坛'
   let token: string = tokenUtils.get()
-
   // 是否有token
   if (token !== null && token !== undefined && token !== '' && token.length !== 0) {
     // 有token是否是登录
@@ -121,6 +122,20 @@ router.beforeEach(async (to, from, next) => {
         flag = true;
       }
     }
+
+    let urlToken = to.query.token
+    if (urlToken != null && urlToken != undefined && urlToken != '') {
+      tokenUtils.set(urlToken+"")
+      try {
+        await $store.dispatch("GetUserInfo")
+        next()
+      } catch (err) {
+        // 如果没获取到用户信息就手动退出
+        tokenUtils.del()
+        next("/login")
+      }
+    }
+
     if (flag) {
       // await $store.dispatch("ChangeShowFlag", true)
       // next(false)
@@ -133,7 +148,7 @@ router.beforeEach(async (to, from, next) => {
 
 //全局后置守卫：初始化时执行、每次路由切换后执行
 router.afterEach((to, from) => {
-  
+
 })
 
 export default router
